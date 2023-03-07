@@ -66,6 +66,17 @@ class Encoding:
         [31373, 995]
         """
         return self._core_bpe.encode_ordinary(text)
+    
+    def encode_ordinary_batch_rust(self, text: list[str]) -> list[int]:
+        """Encodes a string into tokens, ignoring special tokens.
+
+        This is equivalent to `encode(text, disallowed_special=())` (but slightly faster).
+
+        ```
+        >>> enc.encode_ordinary("hello world")
+        [31373, 995]
+        """
+        return self._core_bpe.encode_ordinary_batch_rust(text)
 
     def encode(
         self,

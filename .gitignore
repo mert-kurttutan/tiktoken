@@ -30,6 +30,9 @@ MANIFEST
 .env
 .venv
 
+# data dir
+data/
+
 # Tools
 .mypy_cache
 .coverage

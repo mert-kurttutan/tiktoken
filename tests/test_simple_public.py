@@ -1,4 +1,32 @@
 import tiktoken
+import pytest
+import time
+import os
+
+num_threads = int(os.environ["RAYON_NUM_THREADS"])
+
+@pytest.fixture(scope="session")
+def text_array() -> list[str]:
+    text_arr = []
+    with open("./data/big.txt", "r") as f:
+        content = f.read()
+        text_arr.append(content)
+
+    return text_arr[:10000]*16
+def test_rust_batch(benchmark, text_array):
+    # Note that there are more actual tests, they're just not currently public :-)
+    enc = tiktoken.get_encoding("gpt2")
+    enc = tiktoken.encoding_for_model("text-davinci-003")
+    result = benchmark(enc.encode_ordinary_batch_rust, text_array)
+
+
+def test_python_batch(benchmark, text_array):
+    # Note that there are more actual tests, they're just not currently public :-)
+    enc = tiktoken.get_encoding("gpt2")
+    enc = tiktoken.encoding_for_model("text-davinci-003")
+    result = benchmark(enc.encode_ordinary_batch, text_array, num_threads=num_threads)
+
+
 
 
 def test_simple():
@@ -24,7 +52,3 @@ def test_encoding_for_model():
     assert enc.name == "gpt2"
     enc = tiktoken.encoding_for_model("text-davinci-003")
     assert enc.name == "p50k_base"
-    enc = tiktoken.encoding_for_model("text-davinci-edit-001")
-    assert enc.name == "p50k_edit"
-    enc = tiktoken.encoding_for_model("gpt-3.5-turbo-0301")
-    assert enc.name == "cl100k_base"

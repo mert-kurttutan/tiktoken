@@ -4,6 +4,8 @@
 use std::collections::HashSet;
 use std::thread;
 
+use rayon::prelude::*;
+
 use fancy_regex::Regex;
 use pyo3::exceptions;
 use pyo3::prelude::*;
@@ -494,6 +496,16 @@ impl CoreBPE {
 
     fn encode_ordinary(&self, py: Python, text: &str) -> Vec<usize> {
         py.allow_threads(|| self._encode_ordinary_native(text))
+    }
+
+
+    fn encode_ordinary_batch_rust(&self, text_arr: Vec<&str>) -> Vec<Vec<usize>>{
+        let encodings = text_arr
+            .par_iter()
+            .map(|input| self._encode_ordinary_native(input))
+            .collect();
+
+        return encodings;
     }
 
     fn encode(&self, py: Python, text: &str, allowed_special: HashSet<&str>) -> Vec<usize> {
